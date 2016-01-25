@@ -1,0 +1,36 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        applicationId "app.com.example.android.popular_movies_p1"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    buildTypes.each {
+        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', '"***REMOVED***"'
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:design:23.1.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile files('libs/gson-2.5.jar')
+}
