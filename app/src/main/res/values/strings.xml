@@ -5,5 +5,8 @@
     <!--Settings Menu Options -->
     <string name="popular_sort">Sort By: Most Popular</string>
     <string name="high_rated_sort">Sort By: Highest Rated</string>
-    <string name="title_activity_movie_details">MovieDetails</string>
+    <string name="title_activity_movie_details">Movie Details</string>
+
+    <!-- -->
+
 </resources>
