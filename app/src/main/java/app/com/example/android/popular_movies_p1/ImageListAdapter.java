@@ -3,16 +3,12 @@ package app.com.example.android.popular_movies_p1;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.content.Context;
 import android.widget.ImageView;
 import android.view.View;
 
 // Import Picasso Image Loading Lib
 import com.squareup.picasso.Picasso;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.List;
 
@@ -25,7 +21,6 @@ public class ImageListAdapter extends ArrayAdapter {
 
     private String[] imageUrls;
     private List<String> listImgUrls;
-   // private JSONArray jsonDataArray;
 
     /* Need to Override Constructor for using List to continue
     using methods such as "clear()"*/
@@ -40,21 +35,6 @@ public class ImageListAdapter extends ArrayAdapter {
 
     }
 
-   // public ImageListAdapter(Context context, List<JSONObject> listJsonData) {
-
-   // }
-
-    /*public void setJsonArray(JSONArray array) {
-        this.jsonDataArray = array;
-    }
-
-    public JSONArray getJsonArray() {
-        return this.jsonDataArray;
-    } */
-
-    /* Credit to Future Studio Blog for ImageListAdapter implementation
-    https://futurestud.io/blog/picasso-adapter-use-for-listview-gridview-etc
-     */
     public ImageListAdapter(Context context, String[] imageUrls) {
         super(context, R.layout.grid_item_image, imageUrls);
 
@@ -76,8 +56,7 @@ public class ImageListAdapter extends ArrayAdapter {
         Picasso
                 .with(context)
                 .load(listImgUrls.get(position))
-                //.load(imageUrls[position])
-                .fit() // will explain later
+                .fit()
                 .into((ImageView) convertView);
 
         return convertView;

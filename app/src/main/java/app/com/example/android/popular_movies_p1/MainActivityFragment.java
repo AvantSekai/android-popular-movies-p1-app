@@ -24,10 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,16 +36,7 @@ import com.google.gson.Gson;
  */
 public class MainActivityFragment extends Fragment {
     ImageListAdapter imgListAdapter;
-    MovieParcel movieParcelableObj;
     ArrayList<MovieGson> movieGsonArrayList;
-    //JSONArray movieJsonData;
-
-   /* // List of JSON objects
-    final String TMDB_RESULTS = "results";
-    final String MOVIE_DESCIPTION = "overview";
-    final String RELEASE = "release_date";
-    final String TITLE = "title";
-    final String RELATIVE_IMG_PATH = "poster_path"; */
 
     public MainActivityFragment() {
     }
@@ -94,9 +82,7 @@ public class MainActivityFragment extends Fragment {
                 "http://image.tmdb.org/t/p/w185/5aGhaIHYuQbqlHWvWYqMCnj40y2.jpg",
                 "http://image.tmdb.org/t/p/w185/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg"
         };
-       /* ArrayList<String> movieImages = new ArrayList<String>
-                (Arrays.asList("http://i.imgur.com/DvpvklR.png", "http://i.imgur.com/DvpvklR.png",
-                        "http://i.imgur.com/DvpvklR.png", "http://i.imgur.com/DvpvklR.png")); */
+
         ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages));
 
         // Execute FetchMovieTask before setting up adapter
@@ -136,28 +122,22 @@ public class MainActivityFragment extends Fragment {
 
         /* Check the string parameters sent by the Options Menu
         to define the parameters which will be queried
-         */
+
         protected String retrieveSortMethod(String sortStr) {
             String resultString = null;
             if (sortStr == "popular"){resultString = "popularity.desc";}
             else if(sortStr == "highest_rated"){ resultString ="higest";}
 
             return resultString;
-        }
+        } */
 
         private JSONArray createFromJson(String movieJsonStr)
                 throws JSONException {
-
-            //MovieGson movieJTOGSon = new MovieGson();
             Gson gson = new Gson();
 
-            // JSON Objects
+            // JSON Objects, Arrays and ArrayList
             JSONObject moviesJson = new JSONObject(movieJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
-           // JSONObject movieResults = new JSONObject(movieJsonStr).getJSONObject(TMDB_RESULTS);
-
-            Log.v(LOG_TAG, "JSON OBject " + moviesJson);
-            Log.v(LOG_TAG, "Movies Array " + moviesArray);
             movieGsonArrayList = new ArrayList<MovieGson>(moviesArray.length());
 
             /* Clear out any old instances of the Movie Array list and instantiate
@@ -169,7 +149,6 @@ public class MainActivityFragment extends Fragment {
                 JSONObject movieJson = moviesArray.getJSONObject(i);
                 // Lets take the short path info and create a full path
                 String part_temp_path = movieJson.getString(RELATIVE_IMG_PATH);
-                Log.v(LOG_TAG, "Before replacing " + part_temp_path);
                 // Build real path for poster image and replace "poster_path" data
                 String pathResult = buildPosterPath(part_temp_path);
                 movieJson.remove(RELATIVE_IMG_PATH);
@@ -178,65 +157,39 @@ public class MainActivityFragment extends Fragment {
                 // JSON to Gson conversion for MovieGson Class and add to Movie Array List
                 MovieGson movieGToGSon = gson.fromJson(movieJson.toString(), MovieGson.class);
                 movieGsonArrayList.add(movieGToGSon);
-                Log.v(LOG_TAG, "New value of path " + movieJson.getString(RELATIVE_IMG_PATH));
-                Log.v(LOG_TAG, "MovieGson value" + movieGToGSon.getPoster_path());
             }
-            //Log.v(LOG_TAG, "Movie Results " + movieResults);
-            Log.v(LOG_TAG, "MovieGson ArrayList Size" + movieGsonArrayList.size());
-            Log.v(LOG_TAG, "Update movieArray values " + moviesArray);
-            Log.v(LOG_TAG, "MovieGson ArrayList" + movieGsonArrayList);
             return moviesArray;
         }
 
         private String buildPosterPath(String relativePath) {
-            //String [] poster_paths = new String[movies.length()];
-            //final String RELATIVE_IMG_PATH = "poster_path";
             final String IMG_WIDTH = "w185";
             Uri buildImgPath = Uri.parse(baseImgPath).buildUpon()
                     .appendPath(IMG_WIDTH)
                     . build();
             String full_path = buildImgPath.toString() + relativePath;
-            Log.v(LOG_TAG, "Full path in createMoviePosterPath " + full_path);
-
             return full_path;
         }
 
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
-            movieParcelableObj = new MovieParcel();
             Gson gson = new Gson();
-            //imgListAdapter.setJsonArray(jsonArray);  // Carry over all JSON data to the imgListAdapter
-            //String [] imgPathArray = new String[jsonArray.length()];
-           // ArrayList<String> imgPathAlist = new ArrayList<String>(jsonArray.length());
             ArrayList<String> imgPathList = new ArrayList<String>(movieGsonArrayList.size());
-            Log.v(LOG_TAG, "onPostExecute " + imgListAdapter.getCount());
             imgListAdapter.clear();
             // Retrieve and store the json data containing the Movie Details needed.
             for (int i =0; i<movieGsonArrayList.size(); i++) {
-            //for (int i =0; i<jsonArray.length(); i++) {
                 try {
-                    //JSONObject movieJson = jsonArray.getJSONObject(i);
                     // Poster Path Data
                     MovieGson movieGson = movieGsonArrayList.get(i);
-                    //imgPathlist.add(i, )
                     imgListAdapter.add(movieGson.getPoster_path());
-                           // .getString(RELATIVE_IMG_PATH));
-                    //movieParcelableObj.setPosterPath(movieJson.getString(RELATIVE_IMG_PATH));
-                    //imgListAdapter.add(imgListAdapter.getItem(i));
-                    //Log.v(LOG_TAG, imgPathAlist.get(i));
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
             }
-            //Log.v(LOG_TAG, "Post Execute imgListAdapter.JsonArray" + imgListAdapter.getJsonArray());
-            //imgListAdapter.addAll(imgPathAlist);
             imgListAdapter.notifyDataSetChanged();
         }
 
         protected Void doInBackground(String... params) {
-       // protected JSONArray doInBackground(String... params) {
-            // HTTP and Buffer setup
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -304,7 +257,7 @@ public class MainActivityFragment extends Fragment {
 
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, there's no point in attemping
+                // If the code didn't successfully get the data, there's no point in attemping
                 // to parse it.
                 return null;
             }
