@@ -7,6 +7,8 @@ import org.json.JSONObject;
 
 /**
  * Created by shavant on 1/24/16.
+ * This class will store all the data parsed/serialized from Json using the Gson class.
+ * Stores all the information needed for the Movie Detail view.
  */
 public class MovieGson {
     @SerializedName("title")

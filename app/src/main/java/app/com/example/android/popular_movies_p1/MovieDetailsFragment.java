@@ -3,7 +3,6 @@ package app.com.example.android.popular_movies_p1;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +12,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
-
-import java.io.Serializable;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -45,13 +42,9 @@ public class MovieDetailsFragment extends Fragment {
         MovieDetails Fragments Display.
          */
         if (intent != null ) {
-            Log.v(LOG_TAG, "Inside true for !=null");
             Bundle bundleData = intent.getExtras();
-            Log.v(LOG_TAG, "Bundle contains " + bundleData.getString("MovieDetails"));
             String movieString = bundleData.getString("MovieDetails");
             MovieGson movieDetails = gson.fromJson(movieString, MovieGson.class);
-            Log.v(LOG_TAG, "MovieGson is " + movieDetails.getTitle());
-
             Picasso.with(getContext()).load(movieDetails.getPoster_path()).fit().into(poster);
 
             // Create Textview for Movie Header Title
@@ -60,11 +53,6 @@ public class MovieDetailsFragment extends Fragment {
             voteAverage.setText(movieDetails.getVote_average());
             overview.setText(movieDetails.getOverview());
         }
-
-        else {
-            Log.v(LOG_TAG, "Intent is null");
-        }
-
         return rootView;
     }
 }
