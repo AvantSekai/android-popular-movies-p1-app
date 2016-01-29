@@ -18,14 +18,14 @@ public class MovieGson {
     @SerializedName("release_date")
     private String release_date;
     @SerializedName("vote_average")
-    private Double vote_average;
+    private String vote_average;
 
     public MovieGson() {
 
     }
 
     public MovieGson(String title, String poster_path, String overview, String release_date,
-                     Double vote_average) {
+                     String vote_average) {
         this.title = title;
         this.poster_path = poster_path;
         this.overview = overview;
@@ -65,12 +65,10 @@ public class MovieGson {
         this.release_date = release_date;
     }
 
-    public Double getVote_average() {
+    public String getVote_average() {
         return vote_average;
     }
 
-    public void setVote_average(Double vote_average) {
-        this.vote_average = vote_average;
-    }
+    public void setVote_average(String vote_average) {this.vote_average = vote_average;}
 
 }
