@@ -17,7 +17,8 @@
         android:id="@+id/movie_title_textView"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:background="#8b0fe3" />
+        android:background="#3F51B5"
+        android:textColor="#ffffff" />
 
     <ImageView
         android:layout_width="185dp"

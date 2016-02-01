@@ -57,6 +57,7 @@ public class ImageListAdapter extends ArrayAdapter {
                 .with(context)
                 .load(listImgUrls.get(position))
                 .fit()
+                .placeholder(R.mipmap.noposter)
                 .into((ImageView) convertView);
 
         return convertView;
