@@ -22,7 +22,7 @@ android {
         }
     }
     buildTypes.each {
-        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', '"0"'
+        it.buildConfigField 'String', 'THE_MOVIE_DB_API_KEY', '"***REMOVED***"'
     }
 }
 
