@@ -3,6 +3,7 @@ package app.com.example.android.popular_movies_p1;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,12 +47,14 @@ public class MovieDetailsFragment extends Fragment {
             String movieString = bundleData.getString("MovieDetails");
             MovieGson movieDetails = gson.fromJson(movieString, MovieGson.class);
             Picasso.with(getContext()).load(movieDetails.getPoster_path()).fit().into(poster);
+            String vote_average = movieDetails.getVote_average() + "/10";
 
             // Create Textview for Movie Header Title
             header.setText(movieDetails.getTitle());
             releaseDate.setText(movieDetails.getRelease_date());
-            voteAverage.setText(movieDetails.getVote_average());
+            voteAverage.setText(vote_average);
             overview.setText(movieDetails.getOverview());
+            overview.setMovementMethod(new ScrollingMovementMethod());
         }
         return rootView;
     }

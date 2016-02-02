@@ -67,9 +67,7 @@ public class MovieGson {
         this.release_date = release_date;
     }
 
-    public String getVote_average() {
-        return vote_average;
-    }
+    public String getVote_average() {return vote_average; }
 
     public void setVote_average(String vote_average) {this.vote_average = vote_average;}
 
