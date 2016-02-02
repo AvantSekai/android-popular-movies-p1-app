@@ -82,28 +82,37 @@ public class MainActivityFragment extends Fragment {
                 "http://image.tmdb.org/t/p/w185/5aGhaIHYuQbqlHWvWYqMCnj40y2.jpg",
                 "http://image.tmdb.org/t/p/w185/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg"
         };
-
         ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages));
+      //  ArrayList<String> initialImages = new ArrayList<String>(movieGsonArrayList.size());
 
         // Execute FetchMovieTask before setting up adapter
         //FetchMovieDataTask movieDBTask = new FetchMovieDataTask();
         //movieDBTask.execute();
 
         // Set up ImageListAdapter for use with the main activity
-        //imgListAdapter = new ImageListAdapter(getActivity(), stockimages);
         imgListAdapter = new ImageListAdapter(getActivity(), stocklistimages);
+       // imgListAdapter = new ImageListAdapter(getActivity(), stockimages);
         // Use GridView with the ImagelistAdapter
         GridView gridView = (GridView) rootView.findViewById(R.id.frag_main_gridView);
         gridView.setAdapter(imgListAdapter);
+
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Gson gson = new Gson();
-                MovieGson movie = movieGsonArrayList.get(position);
-                Log.v(LOG_TAG, "Method onCreateView - movie " + movie.getTitle());
-                Intent intent  = new Intent(getActivity(), MovieDetails.class);
-                intent.putExtra("MovieDetails", gson.toJson(movie));
-                startActivity(intent);
+                // Check if Movie Array List is empty
+                if (movieGsonArrayList.isEmpty() || movieGsonArrayList == null) {
+                    // Call FetchMovie onClick to retrieve objects
+                    FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
+                    movieDataTask.execute("original_title.desc");
+                }
+                else {
+                    MovieGson movie = movieGsonArrayList.get(position);
+                    Log.v(LOG_TAG, "Method onCreateView - movie " + movie.getTitle());
+                    Intent intent = new Intent(getActivity(), MovieDetails.class);
+                    intent.putExtra("MovieDetails", gson.toJson(movie));
+                    startActivity(intent);
+                }
             }
         });
         return rootView;
@@ -119,17 +128,6 @@ public class MainActivityFragment extends Fragment {
         final String RELEASE = "release_date";
         final String TITLE = "title";
         final String RELATIVE_IMG_PATH = "poster_path";
-
-        /* Check the string parameters sent by the Options Menu
-        to define the parameters which will be queried
-
-        protected String retrieveSortMethod(String sortStr) {
-            String resultString = null;
-            if (sortStr == "popular"){resultString = "popularity.desc";}
-            else if(sortStr == "highest_rated"){ resultString ="higest";}
-
-            return resultString;
-        } */
 
         private JSONArray createFromJson(String movieJsonStr)
                 throws JSONException {

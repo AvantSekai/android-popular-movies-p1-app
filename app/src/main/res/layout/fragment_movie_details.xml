@@ -58,7 +58,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/vote_average_textView"
-        android:layout_alignEnd="@+id/vote_average_textView" />
+        android:layout_alignEnd="@+id/vote_average_textView"
+        android:scrollbars="vertical"/>
 
 
 </RelativeLayout>
