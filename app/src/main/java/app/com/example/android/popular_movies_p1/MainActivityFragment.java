@@ -1,5 +1,6 @@
 package app.com.example.android.popular_movies_p1;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,9 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,16 +84,9 @@ public class MainActivityFragment extends Fragment {
                 "http://image.tmdb.org/t/p/w185/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg"
         };
         ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages));
-      //  ArrayList<String> initialImages = new ArrayList<String>(movieGsonArrayList.size());
-
-        // Execute FetchMovieTask before setting up adapter
-        //FetchMovieDataTask movieDBTask = new FetchMovieDataTask();
-        //movieDBTask.execute();
 
         // Set up ImageListAdapter for use with the main activity
         imgListAdapter = new ImageListAdapter(getActivity(), stocklistimages);
-       // imgListAdapter = new ImageListAdapter(getActivity(), stockimages);
-        // Use GridView with the ImagelistAdapter
         GridView gridView = (GridView) rootView.findViewById(R.id.frag_main_gridView);
         gridView.setAdapter(imgListAdapter);
 
@@ -100,15 +94,17 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Gson gson = new Gson();
-                // Check if Movie Array List is empty
-                if (movieGsonArrayList.isEmpty() || movieGsonArrayList == null) {
+                // Check if Movie Array List is at startup mode
+                if (movieGsonArrayList == null) { // When no objects instruct user with a toast
                     // Call FetchMovie onClick to retrieve objects
-                    FetchMovieDataTask movieDataTask = new FetchMovieDataTask();
-                    movieDataTask.execute("original_title.desc");
+                    Context currentContext = getContext();
+                    int duration = Toast.LENGTH_SHORT;
+                    String message = "Select a \"SORT BY: Option\" from the Settings menu.";
+                    Toast toast = Toast.makeText(currentContext, message, duration);
+                    toast.show();
                 }
-                else {
+                else { // Handle Intent for Details
                     MovieGson movie = movieGsonArrayList.get(position);
-                    Log.v(LOG_TAG, "Method onCreateView - movie " + movie.getTitle());
                     Intent intent = new Intent(getActivity(), MovieDetails.class);
                     intent.putExtra("MovieDetails", gson.toJson(movie));
                     startActivity(intent);
@@ -124,9 +120,6 @@ public class MainActivityFragment extends Fragment {
 
         // List of JSON objects
         final String TMDB_RESULTS = "results";
-        final String MOVIE_DESCIPTION = "overview";
-        final String RELEASE = "release_date";
-        final String TITLE = "title";
         final String RELATIVE_IMG_PATH = "poster_path";
 
         private JSONArray createFromJson(String movieJsonStr)
@@ -171,8 +164,6 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(Void v) {
             super.onPostExecute(v);
-            Gson gson = new Gson();
-            ArrayList<String> imgPathList = new ArrayList<String>(movieGsonArrayList.size());
             imgListAdapter.clear();
             // Retrieve and store the json data containing the Movie Details needed.
             for (int i =0; i<movieGsonArrayList.size(); i++) {
@@ -195,14 +186,13 @@ public class MainActivityFragment extends Fragment {
             String rawJsonStr = null;
             String sortBy  = params[0];
 
-            Log.v(LOG_TAG, "Sort By Method is " + sortBy);
+            //Log.v(LOG_TAG, "Sort By Method is " + sortBy);
 
             try {
                 final String MOVIE_API_BASEURL = "https://api.themoviedb.org/3";
                 final String DISCOVER = "discover";
                 final String SORT = "sort_by";
                 final String API_KEY = "api_key";
-                final int numMoviePosters = 4;
 
                 // Build URI to create a URL Web address
                 Uri uriBuild = Uri.parse(MOVIE_API_BASEURL).buildUpon()
@@ -212,7 +202,7 @@ public class MainActivityFragment extends Fragment {
                         .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                         .build();
                 URL url = new URL(uriBuild.toString());
-                Log.v(LOG_TAG, "URL " + url);
+                //Log.v(LOG_TAG, "URL " + url);
 
                 // Make a connection to the movie DB
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -242,7 +232,7 @@ public class MainActivityFragment extends Fragment {
                 }
                 rawJsonStr = buffer.toString();
 
-                Log.v(LOG_TAG, "RAW TMDB data " + rawJsonStr);
+                //Log.v(LOG_TAG, "RAW TMDB data " + rawJsonStr);
 
                 try {
                      createFromJson(rawJsonStr);
