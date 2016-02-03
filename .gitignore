@@ -6,4 +6,4 @@
 .DS_Store
 /build
 /captures
-/app/build.gradle
+#/app/build.gradle
