@@ -46,6 +46,7 @@ public class MainActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setHasOptionsMenu(true);
+        final String LOG_TAG = MainActivityFragment.class.getSimpleName();
     }
 
     @Override
@@ -76,6 +77,7 @@ public class MainActivityFragment extends Fragment {
             Bundle savedInstanceState) {
         final String LOG_TAG = MainActivityFragment.class.getSimpleName();
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        Context currentContext = getContext();
         // Create a list of of images to use using ArrayList
          String[] stockimages = {
                 "http://image.tmdb.org/t/p/w185/fqe8JxDNO8B8QfOGTdjh6sPCdSC.jpg",
@@ -84,6 +86,15 @@ public class MainActivityFragment extends Fragment {
                 "http://image.tmdb.org/t/p/w185/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg"
         };
         ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages));
+        NetworkCheck network = new NetworkCheck(currentContext);
+
+        // When no network is present for the User show alertDialog and kill app
+        if (network.checkActiveNetwork()== null) {
+            network.buildDialog();
+        }
+        else {
+            Log.v(LOG_TAG, "Proceed with onCreateView options ");
+        }
 
         // Set up ImageListAdapter for use with the main activity
         imgListAdapter = new ImageListAdapter(getActivity(), stocklistimages);
@@ -232,7 +243,6 @@ public class MainActivityFragment extends Fragment {
                 }
                 rawJsonStr = buffer.toString();
 
-                //Log.v(LOG_TAG, "RAW TMDB data " + rawJsonStr);
 
                 try {
                      createFromJson(rawJsonStr);
