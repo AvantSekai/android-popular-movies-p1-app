@@ -9,7 +9,7 @@ import android.net.NetworkInfo;
 
 /**
  * Created by shavant on 2/5/16.
- * NetworkCheck Class checks the user current network connections and takes actions accordingly
+ * NetworkCheck Class checks the users network connections and takes actions accordingly
  */
 public class NetworkCheck {
     private ConnectivityManager cm;
