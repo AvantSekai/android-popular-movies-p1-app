@@ -52,6 +52,7 @@ public class NetworkCheck {
                 android.os.Process.killProcess(pid);
             }
         });
+        alertDialogbuild.setCancelable(false);
         return alertDialogbuild;
     }
 }

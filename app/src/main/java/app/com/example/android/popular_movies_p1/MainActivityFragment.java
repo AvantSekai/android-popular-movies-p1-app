@@ -29,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 import com.google.gson.Gson;
 
@@ -38,6 +39,7 @@ import com.google.gson.Gson;
 public class MainActivityFragment extends Fragment {
     ImageListAdapter imgListAdapter;
     ArrayList<MovieGson> movieGsonArrayList;
+    ArrayList<String> defaultImages;
 
     public MainActivityFragment() {
     }
@@ -47,6 +49,26 @@ public class MainActivityFragment extends Fragment {
         super.onCreate(savedInstance);
         setHasOptionsMenu(true);
         final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+        Log.v(LOG_TAG, "NoFetch Proceed with onCreateView options ");
+        NetworkCheck network = new NetworkCheck(getContext());
+
+        // When no network is present for the User show alertDialog and kill app
+        if (network.checkActiveNetwork()== null) {
+            network.buildDialog();
+        }
+        else {
+            FetchMovieDataTask defaultTask = new FetchMovieDataTask();
+            defaultTask.execute("popularity.desc");
+            try {
+                if (defaultTask.get() != null) {
+                    defaultImages = new ArrayList<String>(defaultTask.get());
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -79,25 +101,18 @@ public class MainActivityFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         Context currentContext = getContext();
         // Create a list of of images to use using ArrayList
-         String[] stockimages = {
+         /*String[] stockimages = {
                 "http://image.tmdb.org/t/p/w185/fqe8JxDNO8B8QfOGTdjh6sPCdSC.jpg",
                 "http://image.tmdb.org/t/p/w185/kqjL17yufvn9OVLyXYpvtyrFfak.jpg",
                 "http://image.tmdb.org/t/p/w185/5aGhaIHYuQbqlHWvWYqMCnj40y2.jpg",
                 "http://image.tmdb.org/t/p/w185/oXUWEc5i3wYyFnL1Ycu8ppxxPvs.jpg"
         };
-        ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages));
-        NetworkCheck network = new NetworkCheck(currentContext);
-
-        // When no network is present for the User show alertDialog and kill app
-        if (network.checkActiveNetwork()== null) {
-            network.buildDialog();
-        }
-        else {
-            Log.v(LOG_TAG, "Proceed with onCreateView options ");
-        }
-
+        ArrayList<String> stocklistimages = new ArrayList<String>(Arrays.asList(stockimages)); */
+        //ArrayList<String> imgPathList = new ArrayList<>(movieGsonArrayList.size());
         // Set up ImageListAdapter for use with the main activity
-        imgListAdapter = new ImageListAdapter(getActivity(), stocklistimages);
+        if (defaultImages != null) {
+            imgListAdapter = new ImageListAdapter(getActivity(), defaultImages);
+        }
         GridView gridView = (GridView) rootView.findViewById(R.id.frag_main_gridView);
         gridView.setAdapter(imgListAdapter);
 
@@ -125,7 +140,7 @@ public class MainActivityFragment extends Fragment {
         return rootView;
     }
 
-    public class FetchMovieDataTask extends AsyncTask<String, Void, Void> {
+    public class FetchMovieDataTask extends AsyncTask<String, Void, ArrayList> {
         private final String LOG_TAG = FetchMovieDataTask.class.getSimpleName();
         private final String baseImgPath = "http://image.tmdb.org/t/p/";
 
@@ -133,7 +148,7 @@ public class MainActivityFragment extends Fragment {
         final String TMDB_RESULTS = "results";
         final String RELATIVE_IMG_PATH = "poster_path";
 
-        private JSONArray createFromJson(String movieJsonStr)
+        private ArrayList<String> createFromJson(String movieJsonStr)
                 throws JSONException {
             Gson gson = new Gson();
 
@@ -141,6 +156,7 @@ public class MainActivityFragment extends Fragment {
             JSONObject moviesJson = new JSONObject(movieJsonStr);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_RESULTS);
             movieGsonArrayList = new ArrayList<MovieGson>(moviesArray.length());
+            ArrayList<String> imgPathList = new ArrayList<String>(moviesArray.length());
 
             /* Clear out any old instances of the Movie Array list and instantiate
                with length of JsonArray */
@@ -159,8 +175,10 @@ public class MainActivityFragment extends Fragment {
                 // JSON to Gson conversion for MovieGson Class and add to Movie Array List
                 MovieGson movieGToGSon = gson.fromJson(movieJson.toString(), MovieGson.class);
                 movieGsonArrayList.add(movieGToGSon);
+                // Store the image path
+                imgPathList.add(movieGToGSon.getPoster_path());
             }
-            return moviesArray;
+            return imgPathList;
         }
 
         private String buildPosterPath(String relativePath) {
@@ -173,23 +191,26 @@ public class MainActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
-            imgListAdapter.clear();
-            // Retrieve and store the json data containing the Movie Details needed.
-            for (int i =0; i<movieGsonArrayList.size(); i++) {
-                try {
-                    // Poster Path Data
-                    MovieGson movieGson = movieGsonArrayList.get(i);
-                    imgListAdapter.add(movieGson.getPoster_path());
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
+        protected void onPostExecute(ArrayList result) {
+            super.onPostExecute(result);
+            if (imgListAdapter != null) {
+                imgListAdapter.clear();
+
+                // Retrieve and store the json data containing the Movie Details needed.
+                for (int i = 0; i < movieGsonArrayList.size(); i++) {
+                    try {
+                        // Poster Path Data
+                        MovieGson movieGson = movieGsonArrayList.get(i);
+                        imgListAdapter.add(movieGson.getPoster_path());
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                 }
+                imgListAdapter.notifyDataSetChanged();
             }
-            imgListAdapter.notifyDataSetChanged();
         }
 
-        protected Void doInBackground(String... params) {
+        protected ArrayList<String> doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -245,8 +266,8 @@ public class MainActivityFragment extends Fragment {
 
 
                 try {
-                     createFromJson(rawJsonStr);
-                    return null;
+                     ArrayList<String> posters = createFromJson(rawJsonStr);
+                    return posters;
                 }
                 catch (JSONException e) {
                     Log.e(LOG_TAG, "Error " + e.getMessage(), e);
