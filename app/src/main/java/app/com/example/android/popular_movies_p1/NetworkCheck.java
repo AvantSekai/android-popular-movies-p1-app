@@ -29,7 +29,7 @@ public class NetworkCheck {
             buildDialog().create();
             buildDialog().show();
         }
-        else { // Get more info on the Network connection
+        else { // We can get more info on the connection here
 
         }
 

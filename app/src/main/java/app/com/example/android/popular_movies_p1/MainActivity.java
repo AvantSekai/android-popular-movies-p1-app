@@ -6,8 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import app.com.example.android.popular_movies_p1.MainActivityFragment.FetchMovieDataTask;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
